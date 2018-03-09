@@ -101,4 +101,5 @@ variance <- survey::svrVar(qq, sub_pnad_design$scale, sub_pnad_design$rscales,
 
 100*sqrt(variance)/rval
 
+#teste
 
