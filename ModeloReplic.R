@@ -1,3 +1,5 @@
+
+# Estimativa da variancia do Indice de Gini
 ## Usa lodown para ler dados da PNAD
 
 library(lodown)
