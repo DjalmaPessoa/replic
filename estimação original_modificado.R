@@ -23,6 +23,9 @@ pnad_cat <- lodown( "pnad" , pnad_cat )
 
 pnad_df <- readRDS( pnad_cat[ 1 , 'output_filename' ] )
 
+# pnad_df <- readRDS( "D:/Users/owner/Documents/PNAD/2013 main.rds" )
+
+
 # carrega library survey
 
 library(survey)
@@ -60,7 +63,7 @@ pnad_boot_design_post <- postStratify(design = pnad_boot_design ,
                                       strata = ~ v4609 ,
                                       population = pop_types )
 
-# objeto de desenho para domocílios: 
+# objeto de desenho para domicílios: 
 
 pnad_dom_design <- 
   subset(pnad_boot_design_post , v0401==1)
@@ -82,16 +85,32 @@ sum(abs(pnad_dom_design$variables$v4611-wsf)>1)
 
 ## seleciona variáveis de interesse
 
-dadosfies<- subset(pnad_dom_design$variables, select=c("uf","v0302","v8005","v0404","v0602","v9001","v4728","v4743"
-                                         ,"v2103","v2105","v2107","v2109","v2113","v2115","v2117","v2121"
-                                         ,"v2138","v2139","v4618","v4617","v4609", "v4611","one","region","pre_wgt")) 
+dadosfies<- subset(pnad_dom_design$variables, 
+                   select=c("v2103","v2105","v2107","v2109","v2113","v2115","v2117","v2121") )
 
 ## as variáveis "vvxxxx" não estão no dicionário da pnad e não foram lidas. Como obteve?
 
 dadosfies <- transform (dadosfies, v2103 = as.numeric(v2103), v2105 = as.numeric(v2105),
 v2107 = as.numeric(v2107), v2109 = as.numeric(v2109), v2113 = as.numeric(v2113), 
-v2115 = as.numeric(v2115), v2117 = as.numeric(v2117), v2121 = as.numeric(v2121),
-v2138 = as.numeric(v2138), v2139 = as.numeric(v2139))
+v2115 = as.numeric(v2115), v2117 = as.numeric(v2117), v2121 = as.numeric(v2121))
+
+
+
+
+#Itens do EBIA (transformando sim=1, n?o=0)
+
+dadosfies <- transform (dadosfies,
+vv2103 = ifelse(is.na(v2103),0, ifelse(v2103==1,1,0)),
+vv2105 = ifelse(is.na(v2105),0, ifelse(v2105==1,1,0)),
+vv2107 = ifelse(is.na(v2107),0, ifelse(v2107==1,1,0)),
+vv2109 = ifelse(is.na(v2109),0, ifelse(v2109==1,1,0)),
+vv2113 = ifelse(is.na(v2113),0, ifelse(v2113==1,1,0)),
+vv2115 = ifelse(is.na(v2115),0, ifelse(v2115==1,1,0)),
+vv2117 = ifelse(is.na(v2117),0, ifelse(v2117==1,1,0)),
+vv2121 = ifelse(is.na(v2121),0, ifelse(v2121==1,1,0))
+)
+
+
 
 
 #renomeando os itens segundo o FIES
@@ -99,9 +118,9 @@ v2138 = as.numeric(v2138), v2139 = as.numeric(v2139))
 library(plyr)
 
 
-data.FAO_Brasil<-rename(dadosfies, c("v2103"="WORRIED","v2105"="RUNOUT","v2107"="HEALTHY","v2109"="FEWFOOD"
-                                     ,"v2113"="SKIPPED","v2115"='ATELESS',"v2117"="HUNGRY","v2121"="WHLDAY"
-                                     ,"v2138"="Atitude","v2139"="Outra atitude"))
+data.FAO_Brasil<-rename(dadosfies, 
+c("vv2103"="WORRIED","vv2105"="RUNOUT","vv2107"="HEALTHY","vv2109"="FEWFOOD"
+,"vv2113"="SKIPPED","vv2115"='ATELESS',"vv2117"="HUNGRY","vv2121"="WHLDAY"))
 
 
 
