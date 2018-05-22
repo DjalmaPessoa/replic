@@ -170,7 +170,59 @@ sqrt(variance)
 
 RM.w(XX.Brasil, wsf)$se.b["WORRIED"]
 
+## Função para estimar se(b) e se(a) considerando desenho de replicação
 
+svrepRMw <- function(design,...){
+  
+  require(RM.weights)
+  dados <-design$variables
+  
+  dadosfies<- subset(dados,
+  select=c("v2103","v2105","v2107","v2109","v2113","v2115","v2117","v2121") )
+  
+  dadosfies <- transform (dadosfies, v2103 = as.numeric(v2103), v2105 = as.numeric(v2105),
+  v2107 = as.numeric(v2107), v2109 = as.numeric(v2109), v2113 = as.numeric(v2113), 
+  v2115 = as.numeric(v2115), v2117 = as.numeric(v2117), v2121 = as.numeric(v2121))
+  
+  dadosfies <- transform (dadosfies,
+  vv2103 = ifelse(is.na(v2103),0, ifelse(v2103==1,1,0)),
+  vv2105 = ifelse(is.na(v2105),0, ifelse(v2105==1,1,0)),
+  vv2107 = ifelse(is.na(v2107),0, ifelse(v2107==1,1,0)),
+  vv2109 = ifelse(is.na(v2109),0, ifelse(v2109==1,1,0)),
+  vv2113 = ifelse(is.na(v2113),0, ifelse(v2113==1,1,0)),
+  vv2115 = ifelse(is.na(v2115),0, ifelse(v2115==1,1,0)),
+  vv2117 = ifelse(is.na(v2117),0, ifelse(v2117==1,1,0)),
+  vv2121 = ifelse(is.na(v2121),0, ifelse(v2121==1,1,0))
+  )
+  
+  data.FAO_Brasil<-plyr::rename(dadosfies, 
+  c("vv2103"="WORRIED","vv2105"="RUNOUT","vv2107"="HEALTHY","vv2109"="FEWFOOD"
+  ,"vv2113"="SKIPPED","vv2115"='ATELESS',"vv2117"="HUNGRY","vv2121"="WHLDAY"))
+  
+  XX.Brasil = data.FAO_Brasil[,9:16]
+  
+  wsf <- weights(design, "sampling")
+  
+  rval_b <- RM.w(XX.Brasil, wsf)$b
+  
+  wwf <- weights(design, "analysis")
+  
+  qq <- apply(wwf, 2, function(wi)RM.w(XX.Brasil, wi)$b)
+  
+  v_b <- svrVar(qq, design$scale, design$rscales, 
+                mse = design$mse, coef = rval_b)
+  
+  rval_a <- RM.w(XX.Brasil, wsf)$a
+  
+  qq <- apply(wwf, 2, function(wi)RM.w(XX.Brasil, wi)$a)
+  
+  v_a <- svrVar(qq, design$scale, design$rscales, 
+                        mse = design$mse, coef = rval_a)
+  
+  list(b = rval_b, covmat_b = v_b, a = rval_a, covmat_a = v_a )
+ }
 
+## Exemplo:
 
+result <- svrepRMw(pnad_dom_design)
 
