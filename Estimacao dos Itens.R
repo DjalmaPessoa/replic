@@ -1,6 +1,6 @@
 ################################### Tese #############################################
 
-##### Objetivo: Estimar o *erro padrão* de alguma estimativa da minha dissertação usando bootstrap
+##### Objetivo: Estimar o *erro padr?o* de alguma estimativa da minha disserta??o usando bootstrap
 
 setwd("C:/Users/Etienne/Documents/DOUTORADO ENCE/TESE/Base de dados")
 pnad2013DOM<-readRDS("pnad2013DOM.rds")
@@ -14,7 +14,7 @@ options(survey.lonely.psu = "adjust")
 ### escolhendo uma estimativa ###
 
 # Base de dados FIES para o BRASIL (segundo PNAD 2013)
-# Leva em consideração somente os 8 itens referentes a domicílios com maiores de 18 anos
+# Leva em considera??o somente os 8 itens referentes a domic?lios com maiores de 18 anos
 
 dadosfies<- subset(pnad2013DOM, select=c("uf","v0302","v8005","v0404","v0602","v9001","v4728","v4743"
                                    ,"vv2103","vv2105","vv2107","vv2109","vv2113","vv2115","vv2117","vv2121"
@@ -30,8 +30,8 @@ data.FAO_Brasil<-rename(dadosfies, c("vv2103"="WORRIED","vv2105"="RUNOUT","vv210
                                      ,"vv2113"="SKIPPED","vv2115"='ATELESS',"vv2117"="HUNGRY","vv2121"="WHLDAY"
                                      ,"v2138"="Atitude","v2139"="Outra atitude"))
 
-head(pre_wgt) #peso básico do desenho (=v4610)
-head(v4611) #peso do domicílio segundo o dicionário
+head(pre_wgt) #peso b?sico do desenho (=v4610)
+head(v4611) #peso do domic?lio segundo o dicion?rio
 head(one) #peso 1 (teste)
 
 #Fixando o banco de dados
@@ -43,34 +43,34 @@ XX = data.FAO_Brasil[,9:16]  #banco de dados
 str(XX)
 wt= v4611 #peso
 
-# Calcula os escores por linha (Número de "sim" para as oito questões do FIES)
+# Calcula os escores por linha (N?mero de "sim" para as oito quest?es do FIES)
 rv=rowSums(XX)
 
-# Número de Itens (questões) do FIES
+# N?mero de Itens (quest?es) do FIES
 k = ncol(XX)
 
-# Análise Psicométrica
+# An?lise Psicom?trica
 
 #install.packages("RM.weights")
 library(RM.weights) #pacote desenvolvido pela FAO
 #?RM.w
-#rr= RM.w(XX, wt) #função construída o qual usa o Modelo Rasch para estimação dos parâmetros
-  #Alguns resultados oriundos desta função:
-  # Gravidade do Item (parâmetro de posição dos itens) dado por:
+#rr= RM.w(XX, wt) #fun??o constru?da o qual usa o Modelo Rasch para estima??o dos par?metros
+  #Alguns resultados oriundos desta fun??o:
+  # Gravidade do Item (par?metro de posi??o dos itens) dado por:
     #rr$b
-  # Erro padrão do Item dado por:
+  # Erro padr?o do Item dado por:
     #rr$se.b
 
-### Estimando o parâmetro de posição dos itens (rr$b) via bootstrap com base na observação 
-    #de como a função acima RM.w foi construída ### 
+### Estimando o par?metro de posi??o dos itens (rr$b) via bootstrap com base na observa??o 
+    #de como a fun??o acima RM.w foi constru?da ### 
 
 
-# cria réplicas de peso bootstrap 
+# cria r?plicas de peso bootstrap 
 
-# réplicas de pesos antes de pós-estratificar
+# r?plicas de pesos antes de p?s-estratificar
 pnad_bootw <- bootweights(pnad2013DOM$v4617, pnad2013DOM$v4618, replicates = 80)
 
-# cria desenho de replicação antes da pós estratificação
+# cria desenho de replica??o antes da p?s estratifica??o
 pnad_boot_design <-
   survey::svrepdesign(
     weight = ~ pre_wgt ,
@@ -82,14 +82,14 @@ pnad_boot_design <-
     data = pnad2013DOM
   )
 
-# totais de pós estratificação
+# totais de p?s estratifica??o
 pop_types <- 
   data.frame( 
     v4609 = unique( pnad2013DOM$v4609 ) , 
     Freq = unique( pnad2013DOM$v4609 )
   )
 
-# pós estratificação do desenho de replicação
+# p?s estratifica??o do desenho de replica??o
 pnad_boot_design_post <- postStratify(design = pnad_boot_design ,
                                       strata = ~ v4609 ,
                                       population = pop_types )
@@ -97,19 +97,19 @@ pnad_boot_design_post <- postStratify(design = pnad_boot_design ,
 # pesos de desenho, usado para calcular estimativas pontuais 
 wsf <- weights(pnad_boot_design_post, "sampling")
 
-# réplicas de pesos, usadas para estimar a variância:
+# r?plicas de pesos, usadas para estimar a vari?ncia:
 
 wwf <- weights(pnad_boot_design_post, "analysis")
 
-#Função para calcular a estimativa de posição do itens
+#Fun??o para calcular a estimativa de posi??o do itens
 
 #install.packages("psychotools")
 library(psychotools)
 
-# Ao invés de usar wt, usar wsf
-length(wt) #peso convencional (usado na dissertação 2017)
+# Ao inv?s de usar wt, usar wsf
+length(wt) #peso convencional (usado na disserta??o 2017)
 length(wsf) #peso do desenho
-length(wwf) #peso p/ cálculo da variância
+length(wwf) #peso p/ c?lculo da vari?ncia
 
   #weighted likelihood estimation
   #?wle.rasch
@@ -147,16 +147,16 @@ P.i.b <- function(x) {
   return(LL)
 }
 
-# calcula estimativa pontual do parâmetro de posição do dos itens
+# calcula estimativa pontual do par?metro de posi??o do dos itens
 
 opt.w <- optim(seq(-3,3,length.out=k), wle.fit, method = "BFGS", hessian = T)
 (b.w = opt.w$par) #usando wsf 
 names(b.w) = colnames(XX)
 
 p.i.b = colSums( P.i.b(b.w) )
-(se.b.w = sqrt(1/p.i.b))  #erro padrão usando wwf
+(se.b.w = sqrt(1/p.i.b))  #erro padr?o usando wwf
 
-    #dúvida: uso correto dos pesos? 
+    #d?vida: uso correto dos pesos? 
 
 
 

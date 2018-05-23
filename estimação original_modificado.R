@@ -203,6 +203,7 @@ svrepRMw <- function(design,...){
   
   wsf <- weights(design, "sampling")
   
+
   full <- RM.w(XX.Brasil, wsf)
   
   rval_b <- full$b
@@ -235,13 +236,10 @@ svrepRMw <- function(design,...){
   names(se_b)<- names(rval_b)
   
   list(b = rval_b, covmat_b = v_b, e.p_b = se_b, a = rval_a, covmat_a = v_a, ep_a = se_a)
- }
+
+  
 
 ## Exemplo:
 
 result <- svrepRMw(pnad_dom_design)
-
-
-
-
 
